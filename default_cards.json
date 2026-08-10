@@ -1,0 +1,137 @@
+[
+  {
+    "id": "d44ea00d-7f72-4ae7-a623-84154e37ff68",
+    "name": "Blinded",
+    "headerColor": "#124dc4",
+    "effectText": "• You can’t see and automatically fail any ability check that requires sight.\n• Attack rolls against you have Advantage, and your attack rolls have Disadvantage.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "ecdd5f07-4312-4792-9047-5fda52496fee",
+    "name": "Charmed",
+    "headerColor": "#fbff00",
+    "effectText": "• You can’t attack the charmer or target the charmer with damaging abilities or magical effects.\n• The charmer has Advantage on any ability check to interact with you socially.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "a59cd710-d708-45f6-9054-d9c9aaa34922",
+    "name": "Deafened",
+    "headerColor": "#f5ff6b",
+    "effectText": "• You can’t hear and automatically fail any ability check that requires hearing.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "bcaac3ef-7855-42b9-9073-67b86f8ee97d",
+    "name": "Exhaustion",
+    "headerColor": "#001685",
+    "effectText": "• This condition is cumulative. Each time you receive it, you gain 1 Exhaustion level. You die if your Exhaustion level is 6.\n• When you make a D20 Test, the roll is reduced by 2 times your Exhaustion level.\n• Your Speed is reduced by a number of feet equal to 5 times your Exhaustion level.",
+    "escapeText": "Finishing a Long Rest removes 1 of your Exhaustion levels. When your Exhaustion level reaches 0, the condition ends.",
+    "fontSize": 8.5,
+    "print": true
+  },
+  {
+    "id": "9e3eb632-2026-4042-b76c-d8d86b2fa875",
+    "name": "Frightened",
+    "headerColor": "#77ff52",
+    "effectText": "• You have Disadvantage on ability checks and attack rolls while the source of fear is within line of sight.\n• You can’t willingly move closer to the source of fear.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "686f3110-ce53-4f32-ae65-27e3966ef3e7",
+    "name": "Grappled",
+    "headerColor": "#ff6600",
+    "effectText": "• Your Speed is 0 and can’t increase.\n• You have Disadvantage on attack rolls against any target other than the grappler.\n• The grappler can drag or carry you when it moves, but every foot of movement costs it 1 extra foot unless you are Tiny or two or more sizes smaller than it.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "dec6dea8-6563-423f-b626-6011a01b0348",
+    "name": "Incapacitated",
+    "headerColor": "#fb56ed",
+    "effectText": "• You can’t take any action, Bonus Action, or Reaction.\n• Your Concentration is broken.\n• You can’t speak.\n• If you’re Incapacitated when you roll Initiative, you have Disadvantage on the roll.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "1c6b8751-4f83-4da0-9b9f-743b4550d3d3",
+    "name": "Invisible",
+    "headerColor": "#29b4ff",
+    "effectText": "• If you’re Invisible when you roll Initiative, you have Advantage on the roll.\n• You aren’t affected by any effect that requires its target to be seen unless the effect’s creator can somehow see you. Any equipment you are wearing or carrying is also concealed.\n• Attack rolls against you have Disadvantage, and your attack rolls have Advantage. If a creature can somehow see you, you don’t gain this benefit against that creature.",
+    "escapeText": "",
+    "fontSize": 9,
+    "print": true
+  },
+  {
+    "id": "86f56cbc-6d5d-4008-a242-bc814ce4fc20",
+    "name": "Paralyzed",
+    "headerColor": "#ff330f",
+    "effectText": "• You have the Incapacitated condition.\n• Your Speed is 0 and can’t increase.\n• You automatically fail Strength and Dexterity saving throws.\n• Attack rolls against you have Advantage.\n• Any attack roll that hits you is a Critical Hit if the attacker is within 5 feet of you.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "6c871024-6943-44f3-9232-421d8026984f",
+    "name": "Petrified",
+    "headerColor": "#ffa55c",
+    "effectText": "• You are transformed, along with any nonmagical objects you are wearing and carrying, into a solid inanimate substance (usually stone). Your weight ×10 and you cease aging.\n• You are Incapacitated. Speed 0.\n• Attacks against you have Advantage.\n• You automatically fail Strength and Dexterity saving throws.\n• You have Resistance to all damage.\n• You have Immunity to the Poisoned condition.",
+    "escapeText": "",
+    "fontSize": 9,
+    "print": true
+  },
+  {
+    "id": "d2997a93-346b-4348-8834-f1550e881ff8",
+    "name": "Poisoned",
+    "headerColor": "#00b344",
+    "effectText": "• You have Disadvantage on attack rolls and ability checks.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "91e377bd-5d82-483c-8148-79cc4e3f8268",
+    "name": "Prone",
+    "headerColor": "#00e1ff",
+    "effectText": "• Your only movement options are to crawl or to spend an amount of movement equal to half your Speed (round down) to right yourself and thereby end the condition. If your Speed is 0, you can’t right your\n• You have Disadvantage on attack rolls. An attack roll against you has Advantage if the attacker is within 5 feet of you. Otherwise, that attack roll has Disadvantage.",
+    "escapeText": "Spend movement equal to half your Speed (round down) to stand up.",
+    "fontSize": 9,
+    "print": true
+  },
+  {
+    "id": "09a13b67-01b6-4eec-aca9-2d618191d4f6",
+    "name": "Restrained",
+    "headerColor": "#ffdbfc",
+    "effectText": "• Your Speed is 0 and can't increase.\n• Attack rolls against you have Advantage, and your attack rolls have Disadvantage.\n• You have Disadvantage on Dexterity saving throws.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "999fff12-10f8-4d67-a8eb-659023b3dec1",
+    "name": "Stunned",
+    "headerColor": "#cba8ff",
+    "effectText": "• You have the Incapacitated condition.\n• You automatically fail Strength and Dexterity saving throws.\n• Attack rolls against you have Advantage.",
+    "escapeText": "",
+    "fontSize": 10.5,
+    "print": true
+  },
+  {
+    "id": "67c336aa-4f9e-42e6-b574-77a1a1f689ab",
+    "name": "Unconscious",
+    "headerColor": "#1c1c1c",
+    "effectText": "• You have the Incapacitated and Prone conditions, and you drop whatever you’re holding. When this condition ends, you remain Prone.\n• Your Speed is 0 and can't increase.\n• Attacks against you have Advantage.\n• You automatically fail Strength and Dexterity saving throws.\n• Any attack roll that hits you is a Critical Hit if the attacker is within 5 feet of you.\n• You are unaware of your surroundings.",
+    "escapeText": "",
+    "fontSize": 9,
+    "print": true
+  }
+]
