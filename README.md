@@ -1,5 +1,5 @@
 # ConditionCards
-Condition Cards for D&amp;D 2024 or 5.5e
+Condition Cards for DnD 2024 or 5.5e
 
 The coding was 100% done by ChatGPT.
 I handchecked all condition texts.
