@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>D&D 2024 Condition Card Designer v2</title>
+<title>D&D 2024 Condition Card Designer v3</title>
 <style>
   :root{
     --bg:#f3f4f6;
@@ -350,6 +350,9 @@
         Regelbasis der vorbefüllten Karten: D&amp;D 2024 / SRD 5.2.1.
         Die Texte sind für schnelle Lesbarkeit auf Karten komprimiert und bleiben vollständig editierbar.
       </div>
+      <div id="defaultLoadStatus" class="hint" style="margin-top:8px">
+        Default-Datei: wird geprüft …
+      </div>
     </div>
   </section>
 
@@ -394,7 +397,7 @@
 
 <script>
 (() => {
-  const STORAGE_KEY = "dnd_condition_cards_v2_all_conditions";
+  const STORAGE_KEY = "dnd_condition_cards_v3_json_autoload";
 
   const $ = id => document.getElementById(id);
   const els = {
@@ -585,14 +588,59 @@
   let cards = loadCards();
   let activeId = cards[0]?.id || null;
 
-  if (!cards.length) {
-    cards = DEFAULT_CONDITIONS.map(c => ({
-      id: crypto.randomUUID(),
-      ...c,
-      print: true
+  function normalizeCards(data){
+    if (!Array.isArray(data)) throw new Error("default_cards.json must contain a JSON array.");
+    return data.map(c => ({
+      id: c.id || crypto.randomUUID(),
+      name: String(c.name || "Untitled Condition"),
+      headerColor: /^#[0-9a-f]{6}$/i.test(c.headerColor || "") ? c.headerColor : "#e5e7eb",
+      effectText: String(c.effectText || ""),
+      escapeText: String(c.escapeText || ""),
+      fontSize: Number(c.fontSize || 11.5),
+      print: c.print !== false
     }));
-    activeId = cards[0]?.id || null;
-    saveStorage();
+  }
+
+  async function loadDefaultCards(){
+    const status = $("defaultLoadStatus");
+
+    // Existing browser data takes priority so edits are not overwritten on each reload.
+    if (cards.length) {
+      if (status) status.textContent = "Default-Datei: Browser-Speicherstand wird verwendet.";
+      return;
+    }
+
+    try {
+      const response = await fetch("./default_cards.json", { cache: "no-store" });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+
+      const data = await response.json();
+      cards = normalizeCards(data);
+      activeId = cards[0]?.id || null;
+      saveStorage();
+
+      if (status) {
+        status.textContent = `Default-Datei: default_cards.json geladen (${cards.length} Karten).`;
+      }
+    } catch (err) {
+      // Browsers commonly block fetch() from file:// pages. Keep the embedded fallback
+      // so the designer still works when opened by double-clicking the HTML file.
+      cards = DEFAULT_CONDITIONS.map(c => ({
+        id: crypto.randomUUID(),
+        ...c,
+        print: true
+      }));
+      activeId = cards[0]?.id || null;
+      saveStorage();
+
+      if (status) {
+        const fileMode = location.protocol === "file:";
+        status.textContent = fileMode
+          ? "Default-Datei: Browser blockiert automatisches JSON-Laden bei file:// – eingebettete Defaults verwendet."
+          : "Default-Datei: konnte nicht geladen werden – eingebettete Defaults verwendet.";
+      }
+      console.warn("default_cards.json could not be loaded:", err);
+    }
   }
 
   function loadCards(){
@@ -886,8 +934,17 @@
     if (els.importFile.files[0]) importJson(els.importFile.files[0]);
   });
 
-  populateForm(currentCard());
-  renderManager();
+  async function bootstrap(){
+    await loadDefaultCards();
+    if (activeId && currentCard()) {
+      populateForm(currentCard());
+    } else {
+      clearForm();
+    }
+    renderManager();
+  }
+
+  bootstrap();
 })();
 </script>
 </body>
