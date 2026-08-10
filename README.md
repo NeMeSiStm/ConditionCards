@@ -7,6 +7,7 @@ Colors are the same as the condition rings that i own.
 
 you need: dnd_condition_card_designer.html and default_cards.json in the same folder. Every time you open the Designer it loads the default cards.json. when you export your cards you can replace the defaults with them.
 
+Try it out: https://www.nemesistm.com/tools/dnd_condition_card_designer.html
 
 How does it look:
 
