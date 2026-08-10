@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D&D Condition Card Designer</title>
+<style>
+  :root{
+    --bg:#f3f4f6;
+    --panel:#ffffff;
+    --line:#d1d5db;
+    --text:#111827;
+    --muted:#6b7280;
+    --accent:#111827;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  button,input,textarea{font:inherit}
+  button{cursor:pointer}
+  .app{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns:360px minmax(360px,1fr) 360px;
+    gap:16px;
+    padding:16px;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:0 2px 12px rgba(0,0,0,.05);
+    overflow:hidden;
+  }
+  .panel h2{
+    margin:0;
+    padding:16px 18px;
+    font-size:18px;
+    border-bottom:1px solid var(--line);
+  }
+  .panel-body{padding:16px}
+  .field{margin-bottom:14px}
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+    color:#374151;
+  }
+  input[type="text"], textarea, input[type="number"]{
+    width:100%;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    padding:10px 11px;
+    background:white;
+    color:#111827;
+  }
+  textarea{
+    resize:vertical;
+    min-height:138px;
+    line-height:1.35;
+  }
+  #escapeText{min-height:95px}
+  input[type="color"]{
+    width:56px;
+    height:38px;
+    padding:2px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    background:white;
+  }
+  input[type="range"]{width:100%}
+  .color-row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .color-row code{
+    padding:7px 9px;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:6px;
+  }
+  .button-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+  }
+  .btn{
+    border:1px solid #cbd5e1;
+    background:white;
+    color:#111827;
+    border-radius:8px;
+    padding:9px 12px;
+    font-weight:700;
+  }
+  .btn:hover{background:#f8fafc}
+  .btn.primary{
+    background:#111827;
+    color:white;
+    border-color:#111827;
+  }
+  .btn.danger{
+    color:#991b1b;
+    border-color:#fecaca;
+    background:#fff7f7;
+  }
+  .hint{
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.4;
+    margin-top:6px;
+  }
+  .preview-wrap{
+    min-height:calc(100vh - 32px);
+    display:flex;
+    flex-direction:column;
+  }
+  .preview-stage{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    background:
+      linear-gradient(45deg,#eceff3 25%,transparent 25%) 0 0/18px 18px,
+      linear-gradient(45deg,transparent 75%,#eceff3 75%) 0 0/18px 18px,
+      linear-gradient(45deg,transparent 75%,#eceff3 75%) 9px -9px/18px 18px,
+      linear-gradient(45deg,#eceff3 25%,#f7f8fa 25%) 9px -9px/18px 18px;
+  }
+  .preview-info{
+    padding:12px 16px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+    color:#4b5563;
+    font-size:12px;
+  }
+
+  /* Physical card */
+  .condition-card{
+    width:63mm;
+    height:88mm;
+    background:#fff;
+    border:0.45mm solid #111;
+    border-radius:2.2mm;
+    padding:3mm;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    color:#111;
+    box-shadow:0 8px 28px rgba(0,0,0,.16);
+  }
+  .card-title{
+    min-height:12.5mm;
+    border:0.35mm solid #111;
+    border-radius:1.4mm;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:1.8mm 2.4mm;
+    text-align:center;
+    font-family:Arial,Helvetica,sans-serif;
+    font-weight:900;
+    font-size:17pt;
+    line-height:1;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    overflow:hidden;
+  }
+  .card-body{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    padding:3.3mm 1.2mm 1mm;
+    overflow:hidden;
+  }
+  .section-label{
+    font-size:7.5pt;
+    font-weight:900;
+    letter-spacing:.12em;
+    color:#4b5563;
+    margin:0 0 1mm 0;
+  }
+  .effect-text,
+  .escape-text{
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    font-family:Arial,Helvetica,sans-serif;
+    font-weight:600;
+    line-height:1.27;
+  }
+  .escape-block{
+    margin-top:auto;
+    padding-top:2.4mm;
+    border-top:.3mm solid #9ca3af;
+  }
+  .escape-block.hidden{display:none}
+  .overflow-warning{
+    color:#b91c1c;
+    font-weight:800;
+  }
+  .manager-toolbar{
+    display:flex;
+    gap:8px;
+    padding:12px;
+    border-bottom:1px solid var(--line);
+    background:#fafafa;
+  }
+  .manager-toolbar .btn{padding:7px 9px;font-size:12px}
+  .card-list{
+    max-height:calc(100vh - 155px);
+    overflow:auto;
+    padding:10px;
+  }
+  .card-item{
+    border:1px solid #dbe1e8;
+    border-radius:9px;
+    padding:10px;
+    margin-bottom:9px;
+    background:white;
+  }
+  .card-item.active{
+    border-color:#111827;
+    box-shadow:0 0 0 1px #111827 inset;
+  }
+  .card-item-top{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:8px;
+  }
+  .swatch{
+    width:18px;height:18px;border-radius:4px;border:1px solid #111;
+  }
+  .card-name{
+    font-weight:800;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .mini-actions{
+    display:flex;
+    gap:5px;
+    margin-top:8px;
+  }
+  .mini-actions button{
+    font-size:11px;
+    padding:5px 7px;
+    border-radius:6px;
+    border:1px solid #d1d5db;
+    background:#fff;
+  }
+  .print-check{
+    width:16px;height:16px;
+  }
+  .empty{
+    text-align:center;
+    color:#6b7280;
+    padding:28px 8px;
+    font-size:13px;
+  }
+
+  #printArea{display:none}
+
+  @media (max-width:1180px){
+    .app{grid-template-columns:340px 1fr}
+    .manager{grid-column:1 / -1}
+    .card-list{max-height:none}
+  }
+
+  @media print{
+    @page{
+      size:A4 portrait;
+      margin:12mm 8.5mm 12mm 8.5mm;
+    }
+    html,body{
+      width:210mm;
+      background:white !important;
+    }
+    .app{display:none !important}
+    #printArea{
+      display:grid !important;
+      grid-template-columns:repeat(3,63mm);
+      grid-auto-rows:88mm;
+      gap:2mm;
+      width:193mm;
+      margin:0 auto;
+      align-content:start;
+    }
+    #printArea .condition-card{
+      box-shadow:none;
+      break-inside:avoid;
+      page-break-inside:avoid;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="panel editor">
+    <h2>Condition bearbeiten</h2>
+    <div class="panel-body">
+      <div class="field">
+        <label for="name">Condition</label>
+        <input id="name" type="text" maxlength="40" placeholder="z. B. Grappled">
+      </div>
+
+      <div class="field">
+        <label>Farbe der Überschrift</label>
+        <div class="color-row">
+          <input id="headerColor" type="color" value="#d7e3f4">
+          <code id="colorHex">#D7E3F4</code>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="effectText">Effekt / Regeln</label>
+        <textarea id="effectText" placeholder="Beschreibe hier klar und knapp, was die Condition bewirkt."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="escapeText">Wie endet sie? <span style="font-weight:500;text-transform:none">(optional)</span></label>
+        <textarea id="escapeText" placeholder="z. B. Escape DC, Saving Throw am Zugende, endet nach ..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="fontSize">Textgröße: <span id="fontSizeLabel">11.5 pt</span></label>
+        <input id="fontSize" type="range" min="8" max="15" step="0.5" value="11.5">
+        <div class="hint">Die Vorschau verkleinert den Text automatisch nur dann weiter, wenn er sonst nicht auf die Karte passt.</div>
+      </div>
+
+      <div class="button-row">
+        <button class="btn primary" id="saveBtn">Karte speichern</button>
+        <button class="btn" id="newBtn">Neue Karte</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel preview-wrap">
+    <h2>Live-Vorschau</h2>
+    <div class="preview-stage">
+      <div id="previewCard" class="condition-card">
+        <div id="previewTitle" class="card-title">Grappled</div>
+        <div class="card-body">
+          <div class="section-label">EFFECT</div>
+          <div id="previewEffect" class="effect-text"></div>
+          <div id="previewEscapeBlock" class="escape-block">
+            <div class="section-label">ENDS</div>
+            <div id="previewEscape" class="escape-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-info">
+      <span>63 × 88 mm · Pokémon/TCG-Format</span>
+      <span id="fitStatus">Text passt.</span>
+    </div>
+  </section>
+
+  <section class="panel manager">
+    <h2>Card Manager</h2>
+    <div class="manager-toolbar">
+      <button class="btn" id="selectAllBtn">Alle wählen</button>
+      <button class="btn" id="selectNoneBtn">Keine</button>
+      <button class="btn primary" id="printBtn">Auswahl drucken</button>
+    </div>
+    <div class="manager-toolbar" style="border-top:0">
+      <button class="btn" id="exportBtn">JSON exportieren</button>
+      <button class="btn" id="importBtn">JSON importieren</button>
+      <input id="importFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <div id="cardList" class="card-list"></div>
+  </section>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+(() => {
+  const STORAGE_KEY = "dnd_condition_cards_v1";
+
+  const $ = id => document.getElementById(id);
+  const els = {
+    name: $("name"),
+    headerColor: $("headerColor"),
+    colorHex: $("colorHex"),
+    effectText: $("effectText"),
+    escapeText: $("escapeText"),
+    fontSize: $("fontSize"),
+    fontSizeLabel: $("fontSizeLabel"),
+    previewCard: $("previewCard"),
+    previewTitle: $("previewTitle"),
+    previewEffect: $("previewEffect"),
+    previewEscape: $("previewEscape"),
+    previewEscapeBlock: $("previewEscapeBlock"),
+    fitStatus: $("fitStatus"),
+    cardList: $("cardList"),
+    printArea: $("printArea"),
+    importFile: $("importFile")
+  };
+
+  let cards = loadCards();
+  let activeId = cards[0]?.id || null;
+
+  if (!cards.length) {
+    const sample = {
+      id: crypto.randomUUID(),
+      name: "Grappled",
+      headerColor: "#d7e3f4",
+      effectText:
+`Your Speed is 0 and can't increase.
+
+Attacks against any target other than the grappler have Disadvantage if the grappler is within 5 feet of you.`,
+      escapeText:
+`The condition ends if the grappler is Incapacitated or if you are moved outside the grappler's reach.`,
+      fontSize: 11.5,
+      print: true
+    };
+    cards = [sample];
+    activeId = sample.id;
+    saveStorage();
+  }
+
+  function loadCards(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch{
+      return [];
+    }
+  }
+
+  function saveStorage(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  }
+
+  function currentCard(){
+    return cards.find(c => c.id === activeId) || null;
+  }
+
+  function contrastText(hex){
+    const h = hex.replace("#","");
+    const r = parseInt(h.slice(0,2),16);
+    const g = parseInt(h.slice(2,4),16);
+    const b = parseInt(h.slice(4,6),16);
+    const luminance = (0.299*r + 0.587*g + 0.114*b);
+    return luminance > 155 ? "#111111" : "#ffffff";
+  }
+
+  function populateForm(card){
+    els.name.value = card.name || "";
+    els.headerColor.value = card.headerColor || "#d7e3f4";
+    els.effectText.value = card.effectText || "";
+    els.escapeText.value = card.escapeText || "";
+    els.fontSize.value = card.fontSize ?? 11.5;
+    updatePreview();
+  }
+
+  function formData(){
+    return {
+      name: els.name.value.trim() || "Untitled Condition",
+      headerColor: els.headerColor.value,
+      effectText: els.effectText.value.trim(),
+      escapeText: els.escapeText.value.trim(),
+      fontSize: Number(els.fontSize.value)
+    };
+  }
+
+  function updatePreview(){
+    const d = formData();
+    els.colorHex.textContent = d.headerColor.toUpperCase();
+    els.fontSizeLabel.textContent = d.fontSize.toFixed(1) + " pt";
+    els.previewTitle.textContent = d.name;
+    els.previewTitle.style.background = d.headerColor;
+    els.previewTitle.style.color = contrastText(d.headerColor);
+    els.previewEffect.textContent = d.effectText || "Hier steht der Regeltext der Condition.";
+    els.previewEscape.textContent = d.escapeText;
+    els.previewEscapeBlock.classList.toggle("hidden", !d.escapeText);
+
+    requestAnimationFrame(() => fitCardText(els.previewCard, d.fontSize, true));
+  }
+
+  function fitCardText(cardEl, preferredPt, showStatus=false){
+    const body = cardEl.querySelector(".card-body");
+    const effect = cardEl.querySelector(".effect-text");
+    const escape = cardEl.querySelector(".escape-text");
+    let size = Number(preferredPt) || 11.5;
+
+    effect.style.fontSize = size + "pt";
+    escape.style.fontSize = Math.max(8, size - 0.5) + "pt";
+
+    while (body.scrollHeight > body.clientHeight + 1 && size > 8) {
+      size -= 0.25;
+      effect.style.fontSize = size + "pt";
+      escape.style.fontSize = Math.max(8, size - 0.5) + "pt";
+    }
+
+    const fits = body.scrollHeight <= body.clientHeight + 1;
+    if (showStatus) {
+      if (!fits) {
+        els.fitStatus.innerHTML = '<span class="overflow-warning">Zu viel Text – kürzen.</span>';
+      } else if (size < Number(preferredPt) - 0.1) {
+        els.fitStatus.textContent = "Text automatisch auf " + size.toFixed(1) + " pt verkleinert.";
+      } else {
+        els.fitStatus.textContent = "Text passt.";
+      }
+    }
+    return fits;
+  }
+
+  function saveCurrent(){
+    const data = formData();
+    if (activeId && currentCard()) {
+      Object.assign(currentCard(), data);
+    } else {
+      const card = {
+        id: crypto.randomUUID(),
+        ...data,
+        print: true
+      };
+      cards.push(card);
+      activeId = card.id;
+    }
+    saveStorage();
+    renderManager();
+  }
+
+  function newCard(){
+    const card = {
+      id: crypto.randomUUID(),
+      name: "New Condition",
+      headerColor: "#e5e7eb",
+      effectText: "",
+      escapeText: "",
+      fontSize: 11.5,
+      print: true
+    };
+    cards.push(card);
+    activeId = card.id;
+    saveStorage();
+    populateForm(card);
+    renderManager();
+    els.name.select();
+  }
+
+  function duplicateCard(id){
+    const source = cards.find(c => c.id === id);
+    if (!source) return;
+    const copy = {
+      ...source,
+      id: crypto.randomUUID(),
+      name: source.name + " Copy"
+    };
+    cards.push(copy);
+    activeId = copy.id;
+    saveStorage();
+    populateForm(copy);
+    renderManager();
+  }
+
+  function deleteCard(id){
+    const idx = cards.findIndex(c => c.id === id);
+    if (idx < 0) return;
+    const wasActive = activeId === id;
+    cards.splice(idx,1);
+    if (wasActive) activeId = cards[0]?.id || null;
+    saveStorage();
+    if (activeId) populateForm(currentCard());
+    else clearForm();
+    renderManager();
+  }
+
+  function clearForm(){
+    els.name.value = "";
+    els.headerColor.value = "#e5e7eb";
+    els.effectText.value = "";
+    els.escapeText.value = "";
+    els.fontSize.value = "11.5";
+    updatePreview();
+  }
+
+  function renderManager(){
+    if (!cards.length) {
+      els.cardList.innerHTML = '<div class="empty">Noch keine Conditions vorhanden.</div>';
+      return;
+    }
+    els.cardList.innerHTML = "";
+    cards.forEach(card => {
+      const item = document.createElement("div");
+      item.className = "card-item" + (card.id === activeId ? " active" : "");
+      item.innerHTML = `
+        <div class="card-item-top">
+          <input class="print-check" type="checkbox" ${card.print ? "checked" : ""} title="Beim Drucken einschließen">
+          <div class="card-name" title="${escapeHtml(card.name)}">${escapeHtml(card.name)}</div>
+          <div class="swatch" style="background:${card.headerColor}"></div>
+        </div>
+        <div class="mini-actions">
+          <button data-action="edit">Bearbeiten</button>
+          <button data-action="dup">Duplizieren</button>
+          <button data-action="del">Löschen</button>
+        </div>
+      `;
+
+      item.querySelector(".print-check").addEventListener("change", e => {
+        card.print = e.target.checked;
+        saveStorage();
+      });
+      item.querySelector('[data-action="edit"]').addEventListener("click", () => {
+        activeId = card.id;
+        populateForm(card);
+        renderManager();
+      });
+      item.querySelector('[data-action="dup"]').addEventListener("click", () => duplicateCard(card.id));
+      item.querySelector('[data-action="del"]').addEventListener("click", () => deleteCard(card.id));
+      els.cardList.appendChild(item);
+    });
+  }
+
+  function escapeHtml(s=""){
+    return s.replace(/[&<>"']/g, ch => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    })[ch]);
+  }
+
+  function buildCardElement(card){
+    const el = document.createElement("div");
+    el.className = "condition-card";
+    const textColor = contrastText(card.headerColor);
+    el.innerHTML = `
+      <div class="card-title" style="background:${card.headerColor};color:${textColor}">${escapeHtml(card.name)}</div>
+      <div class="card-body">
+        <div class="section-label">EFFECT</div>
+        <div class="effect-text">${escapeHtml(card.effectText).replace(/\n/g,"<br>")}</div>
+        <div class="escape-block ${card.escapeText ? "" : "hidden"}">
+          <div class="section-label">ENDS</div>
+          <div class="escape-text">${escapeHtml(card.escapeText).replace(/\n/g,"<br>")}</div>
+        </div>
+      </div>
+    `;
+    requestAnimationFrame(() => fitCardText(el, card.fontSize, false));
+    return el;
+  }
+
+  function printSelected(){
+    saveCurrent();
+    const selected = cards.filter(c => c.print);
+    if (!selected.length) {
+      alert("Bitte mindestens eine Karte für den Druck auswählen.");
+      return;
+    }
+    els.printArea.innerHTML = "";
+    selected.forEach(card => els.printArea.appendChild(buildCardElement(card)));
+    setTimeout(() => window.print(), 80);
+  }
+
+  function exportJson(){
+    saveCurrent();
+    const blob = new Blob([JSON.stringify(cards,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "dnd-condition-cards.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJson(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const data = JSON.parse(reader.result);
+        if (!Array.isArray(data)) throw new Error("Ungültiges Format");
+        cards = data.map(c => ({
+          id: c.id || crypto.randomUUID(),
+          name: String(c.name || "Untitled Condition"),
+          headerColor: /^#[0-9a-f]{6}$/i.test(c.headerColor || "") ? c.headerColor : "#e5e7eb",
+          effectText: String(c.effectText || ""),
+          escapeText: String(c.escapeText || ""),
+          fontSize: Number(c.fontSize || 11.5),
+          print: c.print !== false
+        }));
+        activeId = cards[0]?.id || null;
+        saveStorage();
+        if (activeId) populateForm(cards[0]); else clearForm();
+        renderManager();
+      }catch(err){
+        alert("Die JSON-Datei konnte nicht importiert werden.");
+      }
+      els.importFile.value = "";
+    };
+    reader.readAsText(file);
+  }
+
+  ["input","change"].forEach(evt => {
+    [els.name, els.headerColor, els.effectText, els.escapeText, els.fontSize].forEach(el => {
+      el.addEventListener(evt, updatePreview);
+    });
+  });
+
+  $("saveBtn").addEventListener("click", saveCurrent);
+  $("newBtn").addEventListener("click", newCard);
+  $("printBtn").addEventListener("click", printSelected);
+  $("selectAllBtn").addEventListener("click", () => {
+    cards.forEach(c => c.print = true); saveStorage(); renderManager();
+  });
+  $("selectNoneBtn").addEventListener("click", () => {
+    cards.forEach(c => c.print = false); saveStorage(); renderManager();
+  });
+  $("exportBtn").addEventListener("click", exportJson);
+  $("importBtn").addEventListener("click", () => els.importFile.click());
+  els.importFile.addEventListener("change", () => {
+    if (els.importFile.files[0]) importJson(els.importFile.files[0]);
+  });
+
+  populateForm(currentCard());
+  renderManager();
+})();
+</script>
+</body>
+</html>
