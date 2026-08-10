@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>D&D Condition Card Designer</title>
+<title>D&D 2024 Condition Card Designer v2</title>
 <style>
   :root{
     --bg:#f3f4f6;
@@ -346,6 +346,10 @@
         <button class="btn primary" id="saveBtn">Karte speichern</button>
         <button class="btn" id="newBtn">Neue Karte</button>
       </div>
+      <div class="hint" style="margin-top:14px">
+        Regelbasis der vorbefüllten Karten: D&amp;D 2024 / SRD 5.2.1.
+        Die Texte sind für schnelle Lesbarkeit auf Karten komprimiert und bleiben vollständig editierbar.
+      </div>
     </div>
   </section>
 
@@ -371,7 +375,7 @@
   </section>
 
   <section class="panel manager">
-    <h2>Card Manager</h2>
+    <h2>Card Manager · 15 Conditions</h2>
     <div class="manager-toolbar">
       <button class="btn" id="selectAllBtn">Alle wählen</button>
       <button class="btn" id="selectNoneBtn">Keine</button>
@@ -390,7 +394,7 @@
 
 <script>
 (() => {
-  const STORAGE_KEY = "dnd_condition_cards_v1";
+  const STORAGE_KEY = "dnd_condition_cards_v2_all_conditions";
 
   const $ = id => document.getElementById(id);
   const els = {
@@ -412,25 +416,182 @@
     importFile: $("importFile")
   };
 
+  const DEFAULT_CONDITIONS = [
+    {
+      name: "Blinded",
+      headerColor: "#6b7280",
+      effectText:
+`• You can't see.
+• You automatically fail ability checks that require sight.
+• Attack rolls against you have Advantage.
+• Your attack rolls have Disadvantage.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 11.5
+    },
+    {
+      name: "Charmed",
+      headerColor: "#f0abfc",
+      effectText:
+`• You can't attack the charmer.
+• You can't target the charmer with damaging abilities or magical effects.
+• The charmer has Advantage on ability checks to interact with you socially.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 11
+    },
+    {
+      name: "Deafened",
+      headerColor: "#cbd5e1",
+      effectText:
+`• You can't hear.
+• You automatically fail ability checks that require hearing.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 12
+    },
+    {
+      name: "Exhaustion",
+      headerColor: "#fca5a5",
+      effectText:
+`• Exhaustion is cumulative. Each time you gain it, your Exhaustion level increases by 1.
+• D20 Test rolls are reduced by 2 × your Exhaustion level.
+• Your Speed is reduced by 5 ft. × your Exhaustion level.
+• You die at Exhaustion level 6.`,
+      escapeText:
+`Finishing a Long Rest removes 1 Exhaustion level. The condition ends when your level reaches 0.`,
+      fontSize: 10.5
+    },
+    {
+      name: "Frightened",
+      headerColor: "#c4b5fd",
+      effectText:
+`• You have Disadvantage on ability checks and attack rolls while the source of fear is within line of sight.
+• You can't willingly move closer to the source of fear.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 11
+    },
+    {
+      name: "Grappled",
+      headerColor: "#fdba74",
+      effectText:
+`• Your Speed is 0 and can't increase.
+• You have Disadvantage on attack rolls against targets other than the grappler.
+• The grappler can drag or carry you. Each foot moved costs it 1 extra foot unless you are Tiny or at least two sizes smaller.`,
+      escapeText:
+`Use an action to make Strength (Athletics) or Dexterity (Acrobatics) vs. the grapple's escape DC. It also ends if the grappler is Incapacitated, you leave its grapple range, or it releases you.`,
+      fontSize: 9.5
+    },
+    {
+      name: "Incapacitated",
+      headerColor: "#fde68a",
+      effectText:
+`• You can't take Actions, Bonus Actions, or Reactions.
+• Your Concentration is broken.
+• You can't speak.
+• If you are Incapacitated when you roll Initiative, you have Disadvantage on that roll.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 10.5
+    },
+    {
+      name: "Invisible",
+      headerColor: "#bae6fd",
+      effectText:
+`• You have Advantage on Initiative if you are Invisible when you roll it.
+• Effects that require their target to be seen can't affect you unless their creator can somehow see you. Your worn/carried equipment is also concealed.
+• Attack rolls against you have Disadvantage, and your attack rolls have Advantage. This benefit doesn't apply against a creature that can see you.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 9
+    },
+    {
+      name: "Paralyzed",
+      headerColor: "#93c5fd",
+      effectText:
+`• You also have the Incapacitated condition.
+• Your Speed is 0 and can't increase.
+• You automatically fail Strength and Dexterity saving throws.
+• Attack rolls against you have Advantage.
+• A hit against you is a Critical Hit if the attacker is within 5 feet.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 10
+    },
+    {
+      name: "Petrified",
+      headerColor: "#a8a29e",
+      effectText:
+`• You and nonmagical objects you wear/carry become a solid inanimate substance, usually stone. Your weight ×10 and you stop aging.
+• You are Incapacitated. Speed 0.
+• Attacks against you have Advantage.
+• You automatically fail Strength and Dexterity saves.
+• You have Resistance to all damage.
+• You are immune to the Poisoned condition.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 8.75
+    },
+    {
+      name: "Poisoned",
+      headerColor: "#86efac",
+      effectText:
+`• You have Disadvantage on attack rolls.
+• You have Disadvantage on ability checks.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 12
+    },
+    {
+      name: "Prone",
+      headerColor: "#d6d3d1",
+      effectText:
+`• Your only movement options are to crawl or stand up.
+• Your attack rolls have Disadvantage.
+• Attacks against you have Advantage if the attacker is within 5 feet.
+• Attacks against you have Disadvantage if the attacker is farther than 5 feet.`,
+      escapeText:
+`Spend movement equal to half your Speed (round down) to stand up. If your Speed is 0, you can't stand up.`,
+      fontSize: 10.5
+    },
+    {
+      name: "Restrained",
+      headerColor: "#fcd34d",
+      effectText:
+`• Your Speed is 0 and can't increase.
+• Attack rolls against you have Advantage.
+• Your attack rolls have Disadvantage.
+• You have Disadvantage on Dexterity saving throws.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 11
+    },
+    {
+      name: "Stunned",
+      headerColor: "#fde047",
+      effectText:
+`• You also have the Incapacitated condition.
+• You automatically fail Strength and Dexterity saving throws.
+• Attack rolls against you have Advantage.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 11.5
+    },
+    {
+      name: "Unconscious",
+      headerColor: "#64748b",
+      effectText:
+`• You are Incapacitated and Prone, and you drop whatever you're holding. When Unconscious ends, you remain Prone.
+• Your Speed is 0 and can't increase.
+• Attacks against you have Advantage.
+• You automatically fail Strength and Dexterity saves.
+• A hit against you is a Critical Hit if the attacker is within 5 feet.
+• You are unaware of your surroundings.`,
+      escapeText: `Ends as specified by the effect that caused the condition.`,
+      fontSize: 8.75
+    }
+  ];
+
   let cards = loadCards();
   let activeId = cards[0]?.id || null;
 
   if (!cards.length) {
-    const sample = {
+    cards = DEFAULT_CONDITIONS.map(c => ({
       id: crypto.randomUUID(),
-      name: "Grappled",
-      headerColor: "#d7e3f4",
-      effectText:
-`Your Speed is 0 and can't increase.
-
-Attacks against any target other than the grappler have Disadvantage if the grappler is within 5 feet of you.`,
-      escapeText:
-`The condition ends if the grappler is Incapacitated or if you are moved outside the grappler's reach.`,
-      fontSize: 11.5,
+      ...c,
       print: true
-    };
-    cards = [sample];
-    activeId = sample.id;
+    }));
+    activeId = cards[0]?.id || null;
     saveStorage();
   }
 
